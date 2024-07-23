@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="./src/assets/Iconprotuario.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href='https://fonts.googleapis.com/css?family=DM Sans' rel='stylesheet'>
+    <title>Pep</title>
+  </head>
+  <body>
+    <header class="header">
+      <div class="container">
+          <div class="navbar-header">
+              <a ><img class="logo" src="./src/assets/Iconprotuario.png" alt=""></a>
+          </div>
+      </div>
+      <nav class="popover__wrapper">
+          <div class="container-menu">
+              <img src="./src/assets/menuWhite.svg" alt="">
+              <div class="popover__content">
+                  <a href="" class="menu-item"><img src="./src/assets/ExaBlack.svg">Adicionar Exames</a>
+                  <a href="" class="menu-item"><img src="./src/assets/ExaBlack.svg">Ultimos Exames</a>
+                  <a href="" class="menu-item"><img src="./src/assets/InfBlack.svg">Consultas</a>
+                  <a href="" class="menu-item"><img src="./src/assets/MedBlack.svg">Medicamentos</a>
+                  <a href="" class="menu-item"><img src="./src/assets/PersinBlack.svg">Perfil</a>
+                  <a sec:authorize="isAuthenticated()" href="@{/logout}" class="menu-item"><img src="./src/logoutRed.svg" alt="">Sair</a>
+              </div>
+          </div>
+      </nav>
+  </header>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
