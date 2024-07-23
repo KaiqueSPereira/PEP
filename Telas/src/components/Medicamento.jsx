@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../css/novaconsulta.css';
 
-
-
 // Componente para o formulário de medicamento
 const FormularioMedicamento = () => {
     const [dose, setDose] = useState('');
@@ -12,7 +10,17 @@ const FormularioMedicamento = () => {
     const [frequencia, setFrequencia] = useState('');
     const [duracao, setDuracao] = useState('');
     const [terminoTratamento, setTerminoTratamento] = useState('');
+    const [inicioTratamento, setInicioTratamento] = useState('');
+    const [tempoTratamento, setTempoTratamento] = useState('');
+    const [unidadeTempo, setUnidadeTempo] = useState('dias');
+    const [intervaloTratamento, setIntervaloTratamento] = useState('');
 
+    // Função para mostrar ou ocultar campos com base na frequência selecionada
+    const mostrarOcultarCampos = () => {
+        // A visibilidade dos campos pode ser controlada via estado
+    };
+
+    // Função para calcular a duração do medicamento
     const calcularDuracaoMedicamento = () => {
         if (!dose || !estoque || !intervalo) return;
 
@@ -25,33 +33,26 @@ const FormularioMedicamento = () => {
         setDuracao(duracao + " dias");
     };
 
+    // Função para calcular a data de término do tratamento
     const calcularTerminoTratamento = () => {
-        const inicioTratamento = new Date(document.getElementById('inicio-tratamento').value);
-        const tempoTratamento = parseFloat(document.getElementById('tempo-tratamento').value);
-        const unidadeTempo = document.getElementById('unidade-tempo').value;
-        const intervaloTratamento = parseFloat(document.getElementById('intervalo-tratamento').value);
-        const unidadeIntervalo = document.getElementById('unidade-intervalo').value;
+        if (!inicioTratamento || !tempoTratamento || !intervaloTratamento) return;
 
-        if (unidadeTempo === 'semanas') {
-            tempoTratamento *= 7;
-        } else if (unidadeTempo === 'meses') {
-            tempoTratamento *= 30;
-        } else if (unidadeTempo === 'horas') {
-            tempoTratamento /= 24;
-        }
+        let tempoTratamentoDias = parseFloat(tempoTratamento);
+        if (unidadeTempo === 'semanas') tempoTratamentoDias *= 7;
+        else if (unidadeTempo === 'meses') tempoTratamentoDias *= 30;
+        else if (unidadeTempo === 'horas') tempoTratamentoDias /= 24;
 
-        if (unidadeIntervalo === 'semanas') {
-            intervaloTratamento *= 7;
-        } else if (unidadeIntervalo === 'meses') {
-            intervaloTratamento *= 30;
-        } else if (unidadeIntervalo === 'horas') {
-            intervaloTratamento /= 24;
-        }
+        let intervaloTratamentoDias = parseFloat(intervaloTratamento);
+        if (unidadeIntervalo === 'semanas') intervaloTratamentoDias *= 7;
+        else if (unidadeIntervalo === 'meses') intervaloTratamentoDias *= 30;
+        else if (unidadeIntervalo === 'horas') intervaloTratamentoDias /= 24;
 
-        const terminoTratamento = new Date(inicioTratamento.getTime() + tempoTratamento * intervaloTratamento * 24 * 60 * 60 * 1000);
-        const dia = terminoTratamento.getDate().toString().padStart(2, '0');
-        const mes = (terminoTratamento.getMonth() + 1).toString().padStart(2, '0');
-        const ano = terminoTratamento.getFullYear();
+        const inicioTratamentoDate = new Date(inicioTratamento);
+        const terminoTratamentoDate = new Date(inicioTratamentoDate.getTime() + tempoTratamentoDias * intervaloTratamentoDias * 24 * 60 * 60 * 1000);
+
+        const dia = terminoTratamentoDate.getDate().toString().padStart(2, '0');
+        const mes = (terminoTratamentoDate.getMonth() + 1).toString().padStart(2, '0');
+        const ano = terminoTratamentoDate.getFullYear();
         setTerminoTratamento(`${dia}/${mes}/${ano}`);
     };
 
@@ -61,23 +62,27 @@ const FormularioMedicamento = () => {
 
     useEffect(() => {
         calcularTerminoTratamento();
-    }, [document.getElementById('inicio-tratamento')?.value, document.getElementById('tempo-tratamento')?.value, document.getElementById('unidade-tempo')?.value, document.getElementById('intervalo-tratamento')?.value, document.getElementById('unidade-intervalo')?.value]);
+    }, [inicioTratamento, tempoTratamento, unidadeTempo, intervaloTratamento]);
+
+    useEffect(() => {
+        mostrarOcultarCampos();
+    }, [frequencia]);
 
     return (
         <form id="medicamento-form">
-            <div>
+            <div className="form-group">
                 <label htmlFor="dose">Dose:</label>
                 <input type="number" id="dose" value={dose} onChange={(e) => setDose(e.target.value)} />
             </div>
-            <div>
+            <div className="form-group">
                 <label htmlFor="estoque">Estoque:</label>
                 <input type="number" id="estoque" value={estoque} onChange={(e) => setEstoque(e.target.value)} />
             </div>
-            <div>
+            <div className="form-group">
                 <label htmlFor="intervalo">Intervalo:</label>
                 <input type="number" id="intervalo" value={intervalo} onChange={(e) => setIntervalo(e.target.value)} />
             </div>
-            <div>
+            <div className="form-group">
                 <label htmlFor="unidade-intervalo">Unidade Intervalo:</label>
                 <select id="unidade-intervalo" value={unidadeIntervalo} onChange={(e) => setUnidadeIntervalo(e.target.value)}>
                     <option value="dias">Dias</option>
@@ -86,7 +91,7 @@ const FormularioMedicamento = () => {
                     <option value="horas">Horas</option>
                 </select>
             </div>
-            <div>
+            <div className="form-group">
                 <label htmlFor="frequencia">Frequência:</label>
                 <select id="frequencia" value={frequencia} onChange={(e) => setFrequencia(e.target.value)}>
                     <option value="">Selecione</option>
@@ -94,6 +99,41 @@ const FormularioMedicamento = () => {
                     <option value="tratamento">Tratamento</option>
                 </select>
             </div>
+
+            {/* Campos que aparecem de acordo com a frequência */}
+            {frequencia === 'continuo' && (
+                <div id="usoContinuoFields">
+                    <div className="form-group">
+                        <label htmlFor="inicio-tratamento">Início do Tratamento:</label>
+                        <input type="date" id="inicio-tratamento" value={inicioTratamento} onChange={(e) => setInicioTratamento(e.target.value)} />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="tempo-tratamento">Tempo de Tratamento:</label>
+                        <input type="number" id="tempo-tratamento" value={tempoTratamento} onChange={(e) => setTempoTratamento(e.target.value)} />
+                    </div>
+                    <div>
+                        <label htmlFor="unidade-tempo">Unidade Tempo:</label>
+                        <select id="unidade-tempo" value={unidadeTempo} onChange={(e) => setUnidadeTempo(e.target.value)}>
+                            <option value="dias">Dias</option>
+                            <option value="semanas">Semanas</option>
+                            <option value="meses">Meses</option>
+                            <option value="horas">Horas</option>
+                        </select>
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="intervalo-tratamento">Intervalo Tratamento:</label>
+                        <input type="number" id="intervalo-tratamento" value={intervaloTratamento} onChange={(e) => setIntervaloTratamento(e.target.value)} />
+                    </div>
+                </div>
+            )}
+
+            {frequencia === 'tratamento' && (
+                <div id="tratamentoFields">
+                    {/* Campos específicos para tratamento */}
+                    {/* Adicione aqui campos específicos, se houver */}
+                </div>
+            )}
+
             <div>
                 <label htmlFor="duracao">Duração:</label>
                 <p id="duracao">{duracao}</p>
@@ -102,14 +142,17 @@ const FormularioMedicamento = () => {
                 <label htmlFor="termino-tratamento">Término do Tratamento:</label>
                 <input type="text" id="termino-tratamento" value={terminoTratamento} readOnly />
             </div>
+            <div id="anexo-receita">
+                {/* Anexo receita ou outro campo */}
+            </div>
             <button type="submit">Enviar</button>
         </form>
     );
 };
 
 // Componente principal do modal
-const ModalMedicamento = ({ isVisible, onClose }) => {
-    if (!isVisible) return null;
+const Medicamento = ({ isOpen, onClose }) => {
+    if (!isOpen) return null;
 
     return (
         <div className="modal" id="medicamentoModal">
@@ -122,4 +165,4 @@ const ModalMedicamento = ({ isVisible, onClose }) => {
     );
 };
 
-export default ModalMedicamento;
+export default Medicamento;
